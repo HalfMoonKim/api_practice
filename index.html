@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KakaoBook | 검색</title>
+
+    <!-- style -->
+    <link rel="stylesheet" href="./css/default.css">
+    <link rel="stylesheet" href="./css/common.css">
+    <!-- // style -->
+</head>
+
+<body>
+    <div id="wrap" class="wrap">
+        <!-- header -->
+        <header id="header" class="header">
+            <div class="container">
+                <a href="/" class="logo">API Practice_허허허</a>
+            </div>
+        </header>
+        <!-- // header -->
+
+        <!-- search main -->
+        <section id="main" class="main">
+            <div class="container">
+                <div class="main-header">
+                    <p>Book Search Using Kakao API</p>
+                </div>
+                <div class="search-wrap">
+                    <input id="search_input" type="text" placeholder="검색명을 입력하시오."
+                        onkeydown="JavaScript:Enter_Check();">
+                    <button id="search_btn" onclick="JavaScript:searchEvent()">검색</button>
+                </div>
+                <div class="main-content">
+                    <ul id="book_list" class="book-list clearfix"></ul>
+                </div>
+            </div>
+        </section>
+        <!-- // search main -->
+    </div>
+
+    <!-- scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"
+        integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery.dotdotdot/4.1.0/dotdotdot.min.js"
+        integrity="sha512-8ktnWJ2vveJSuBy1vrbrONhNQCPA9FFOo+yGyCUGnXMaBcPdEYovjEPxBC0Fpa/nbuXaPSio5fud6DPcSNssqQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // book-list 관련
+        function searchEvent() {
+            $('#book_list').html('');
+
+            $.ajax({
+                type: "get",
+                url: "https://dapi.kakao.com/v3/search/book?target=title",
+                data: {
+                    query: $('#search_input').val(),
+                    sort: "latest",
+                    size: 50,
+                },
+                headers: {
+                    Authorization: "KakaoAK d0ab726ef3222d8969ee805e0f0435f8"
+                },
+                dataType: "json",
+                success: function (data, status, xhr) {
+                    console.log(data);
+                    for (let i = 0; i < data.documents.length; i++) {
+                        $('#book_list').append(`<li>
+                                        <p class="book-title">${data.documents[i].title}</p>
+                                        <img src="${data.documents[i].thumbnail}"/>
+                                        <p>${data.documents[i].price} 원</p>
+                                        <p>${data.documents[i].status}</p>
+                                        <a href="${data.documents[i].url}" target="_blank" class="book-link">상세보기</p>
+                                    </li>`)
+                    }
+                    $('.book-title').dotdotdot();
+
+                },
+                error: function (jqXHR, status, error) {
+                    console.log("실패 : " + error);
+
+                    if ($('#search_input').val('')) {
+                        alert("검색어를 입력하십시오.")
+                    } else {
+                        alert("시스템 오류입니다. 잠시 후 다시 시도해주세요.")
+                    }
+                }
+            });
+        }
+
+        function Enter_Check() {
+            if (event.keyCode == 13) {
+                searchEvent();
+            }
+        }
+    </script>
+    <!-- // scripts -->
+</body>
+
+</html>
